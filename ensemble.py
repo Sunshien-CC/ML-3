@@ -48,7 +48,7 @@ class AdaBoostClassifier:
             Z_i=sum(weight)#规范化因子
             weight=np.array([w/Z_i for w in weight])
 
-    def predict_scores(self, X,y):
+    def predict_scores(self, X):
         '''Calculate the weighted sum score of the whole base classifiers for given samples.
 
         Args:
@@ -57,9 +57,10 @@ class AdaBoostClassifier:
         Returns:
             An one-dimension ndarray indicating the scores of differnt samples, which shape should be (n_samples,1).
         '''
-        y_pre=self.predict(X)
-        with open('report.txt',mode='w') as f:
-            f.write(classification_report(y_pre,y))
+        scores=np.zeros(X.shape[0])
+        for i in range(len(self.alpha)):#每个分类器预测出来的值乘以α再相加
+            scores +=self.alpha[i]*self.clf[i].predict(X)
+        return scores
         
 
     def predict(self, X, threshold=0):
@@ -72,9 +73,7 @@ class AdaBoostClassifier:
         Returns:
             An ndarray consists of predicted labels, which shape should be (n_samples,1).
         '''
-        result=np.zeros(X.shape[0])
-        for i in range(len(self.alpha)):#每个分类器预测出来的值乘以α再相加
-            result +=self.alpha[i]*self.clf[i].predict(X)
+        result=self.predict_scores(X)
         #符号函数，将值映射到+1和-1
         for i in range(len(result)):
             if result[i]>0.0:

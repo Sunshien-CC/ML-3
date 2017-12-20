@@ -39,9 +39,10 @@ if __name__ == "__main__":
     X_train,X_validation,y_train,y_validation=train_test_split(data,label,test_size=0.3,random_state=1000)
     #Adaboost 20个分类器，每个决策树只有一个节点
     model=AdaBoostClassifier(DecisionTreeClassifier,20)
-    model.fit(X_train,y_train)
-    model.predict_scores(X_validation,y_validation)
-
+    model.fit(X_train,y_train)#训练模型
+    y_pre=model.predict(X_validation)#预测
+    with open('report.txt',mode='w') as f:
+        f.write(classification_report(y_pre,y_validation))
     #单个分类器
     model=DecisionTreeClassifier(max_depth=1).fit(X_train,y_train)
     y_pre=model.predict(X_validation)
